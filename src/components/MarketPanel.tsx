@@ -1,12 +1,23 @@
 import { motion } from "framer-motion";
-import { ShoppingBag, Coins, Clock, Lock } from "lucide-react";
+import { ShoppingBag, Coins, Clock, Lock, Users } from "lucide-react";
+import { useI18n } from "@/lib/i18n";
 
 const shopItems = [
-  { name: "تعزيز XP مضاعف (24 ساعة)", price: 200, icon: "⚡", rarity: "rare" },
-  { name: "صندوق بطاقات عشوائي", price: 150, icon: "🎁", rarity: "normal" },
-  { name: "إعادة ملء الطاقة", price: 100, icon: "🔋", rarity: "normal" },
-  { name: "تغيير لقب مخصص", price: 500, icon: "✏️", rarity: "epic" },
-  { name: "ثيم حصري: ملك الظلال", price: 2000, icon: "👑", rarity: "ssr" },
+  { name: { ar: "تعزيز XP مضاعف (24 ساعة)", en: "Double XP Boost (24h)" }, price: 500, icon: "⚡", rarity: "rare" },
+  { name: { ar: "صندوق بطاقات عشوائي", en: "Random Card Box" }, price: 300, icon: "🎁", rarity: "normal" },
+  { name: { ar: "إعادة ملء الطاقة", en: "Energy Refill" }, price: 250, icon: "🔋", rarity: "normal" },
+  { name: { ar: "تغيير لقب مخصص", en: "Custom Title Change" }, price: 1500, icon: "✏️", rarity: "epic" },
+  { name: { ar: "ثيم حصري: ملك الظلال", en: "Exclusive Theme: Shadow King" }, price: 5000, icon: "👑", rarity: "ssr" },
+  { name: { ar: "درع الحماية (24 ساعة)", en: "Protection Shield (24h)" }, price: 400, icon: "🛡️", rarity: "rare" },
+  { name: { ar: "تذكرة استدعاء مجانية", en: "Free Summon Ticket" }, price: 800, icon: "🎫", rarity: "epic" },
+  { name: { ar: "مضاعف عملات (12 ساعة)", en: "Coin Multiplier (12h)" }, price: 600, icon: "💰", rarity: "rare" },
+  { name: { ar: "إعادة تعيين المهمات", en: "Quest Reset" }, price: 350, icon: "🔄", rarity: "normal" },
+  { name: { ar: "إطار بروفايل ذهبي", en: "Gold Profile Frame" }, price: 3000, icon: "🖼️", rarity: "ssr" },
+  { name: { ar: "تعزيز سرعة القراءة", en: "Reading Speed Boost" }, price: 200, icon: "📖", rarity: "normal" },
+  { name: { ar: "رمز تعبيري حصري", en: "Exclusive Emoji Pack" }, price: 1000, icon: "😈", rarity: "epic" },
+  { name: { ar: "تذكرة غارة VIP", en: "VIP Raid Ticket" }, price: 2000, icon: "⚔️", rarity: "ssr" },
+  { name: { ar: "صندوق الحظ الأسود", en: "Black Luck Box" }, price: 4000, icon: "🎲", rarity: "ssr" },
+  { name: { ar: "جرعة الخبرة المركزة", en: "Concentrated XP Potion" }, price: 750, icon: "🧪", rarity: "epic" },
 ];
 
 const rarityBorders: Record<string, string> = {
@@ -17,36 +28,56 @@ const rarityBorders: Record<string, string> = {
 };
 
 export default function MarketPanel() {
+  const { t, lang } = useI18n();
+
   return (
     <div className="space-y-8">
       <h2 className="text-2xl font-display font-bold text-foreground flex items-center gap-2">
         <ShoppingBag size={24} className="text-accent" />
-        السوق
+        {t("market")}
       </h2>
 
       {/* Main Shop */}
       <section className="space-y-3">
-        <h3 className="font-display font-bold text-lg text-foreground">المتجر الرئيسي</h3>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+        <h3 className="font-display font-bold text-lg text-foreground">{t("mainShop")}</h3>
+        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-2 md:gap-3">
           {shopItems.map((item, i) => (
             <motion.div
-              key={item.name}
+              key={i}
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.1 }}
-              className={`glass rounded-xl p-4 border ${rarityBorders[item.rarity]} hover:scale-[1.02] transition-transform cursor-pointer`}
+              transition={{ delay: i * 0.05 }}
+              className={`glass rounded-xl p-3 md:p-4 border ${rarityBorders[item.rarity]} hover:scale-[1.02] transition-transform cursor-pointer`}
             >
-              <div className="flex items-start gap-3">
-                <span className="text-3xl">{item.icon}</span>
-                <div className="flex-1">
-                  <h4 className="font-bold text-sm text-foreground">{item.name}</h4>
-                  <p className="flex items-center gap-1 mt-2 text-sm text-gold font-bold">
-                    <Coins size={14} />{item.price}
+              <div className="flex items-start gap-2 md:gap-3">
+                <span className="text-2xl md:text-3xl">{item.icon}</span>
+                <div className="flex-1 min-w-0">
+                  <h4 className="font-bold text-xs md:text-sm text-foreground line-clamp-2">
+                    {lang === "en" ? item.name.en : item.name.ar}
+                  </h4>
+                  <p className="flex items-center gap-1 mt-1.5 text-xs md:text-sm text-gold font-bold">
+                    <Coins size={12} />{item.price}
                   </p>
                 </div>
               </div>
+              <button className="w-full mt-2 py-1.5 rounded-lg bg-primary/20 text-primary text-xs font-bold hover:bg-primary/30 transition-colors">
+                {t("buy")}
+              </button>
             </motion.div>
           ))}
+        </div>
+      </section>
+
+      {/* Player Market */}
+      <section className="space-y-3">
+        <h3 className="font-display font-bold text-lg text-foreground flex items-center gap-2">
+          <Users size={16} className="text-accent" />
+          {t("playerMarket")}
+        </h3>
+        <div className="glass rounded-xl p-6 text-center border border-dashed border-muted">
+          <Users size={32} className="mx-auto text-muted-foreground mb-3" />
+          <p className="text-muted-foreground text-sm">{t("playerMarketDesc")}</p>
+          <p className="text-xs text-muted-foreground mt-1">{t("comingSoon")}</p>
         </div>
       </section>
 
@@ -54,13 +85,12 @@ export default function MarketPanel() {
       <section className="space-y-3">
         <h3 className="font-display font-bold text-lg text-foreground flex items-center gap-2">
           <Lock size={16} className="text-muted-foreground" />
-          السوق السوداء
-          <span className="text-xs text-muted-foreground">(تظهر في أوقات سرية)</span>
+          {t("blackMarket")}
         </h3>
-        <div className="glass rounded-xl p-8 text-center border border-dashed border-muted">
+        <div className="glass rounded-xl p-6 md:p-8 text-center border border-dashed border-muted">
           <Clock size={32} className="mx-auto text-muted-foreground mb-3" />
-          <p className="text-muted-foreground text-sm">السوق السوداء مغلقة حالياً</p>
-          <p className="text-xs text-muted-foreground mt-1">تُفتح في أوقات عشوائية — ابقَ متصلاً!</p>
+          <p className="text-muted-foreground text-sm">{t("blackMarketClosed")}</p>
+          <p className="text-xs text-muted-foreground mt-1">{t("stayConnected")}</p>
         </div>
       </section>
     </div>

@@ -111,6 +111,7 @@
   }
   .scrollbar-hide::-webkit-scrollbar { display: none; }
   .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+  .safe-area-bottom { padding-bottom: env(safe-area-inset-bottom, 0px); }
 }
 
 @keyframes float {

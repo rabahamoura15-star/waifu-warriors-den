@@ -1,26 +1,30 @@
 const ANILIST_URL = "https://graphql.anilist.co";
 
+const MEDIA_FIELDS = `
+  id
+  title { romaji english native }
+  coverImage { extraLarge large color }
+  bannerImage
+  description(asHtml: false)
+  genres
+  averageScore
+  popularity
+  status
+  chapters
+  episodes
+  format
+  season
+  seasonYear
+  meanScore
+  trending
+  nextAiringEpisode { airingAt episode }
+`;
+
 const TRENDING_QUERY = `
 query ($page: Int, $perPage: Int, $type: MediaType) {
   Page(page: $page, perPage: $perPage) {
     media(type: $type, sort: TRENDING_DESC, isAdult: false) {
-      id
-      title { romaji english native }
-      coverImage { extraLarge large color }
-      bannerImage
-      description(asHtml: false)
-      genres
-      averageScore
-      popularity
-      status
-      chapters
-      episodes
-      format
-      season
-      seasonYear
-      meanScore
-      trending
-      nextAiringEpisode { airingAt episode }
+      ${MEDIA_FIELDS}
     }
   }
 }`;
@@ -29,17 +33,7 @@ const SEARCH_QUERY = `
 query ($search: String, $type: MediaType, $page: Int, $perPage: Int) {
   Page(page: $page, perPage: $perPage) {
     media(search: $search, type: $type, sort: SEARCH_MATCH, isAdult: false) {
-      id
-      title { romaji english native }
-      coverImage { extraLarge large color }
-      bannerImage
-      description(asHtml: false)
-      genres
-      averageScore
-      popularity
-      status
-      chapters
-      format
+      ${MEDIA_FIELDS}
     }
   }
 }`;
@@ -48,17 +42,39 @@ const POPULAR_QUERY = `
 query ($page: Int, $perPage: Int, $type: MediaType) {
   Page(page: $page, perPage: $perPage) {
     media(type: $type, sort: POPULARITY_DESC, isAdult: false) {
-      id
-      title { romaji english native }
-      coverImage { extraLarge large color }
-      bannerImage
-      description(asHtml: false)
-      genres
-      averageScore
-      popularity
-      status
-      chapters
-      format
+      ${MEDIA_FIELDS}
+    }
+  }
+}`;
+
+const DETAIL_QUERY = `
+query ($id: Int) {
+  Media(id: $id) {
+    ${MEDIA_FIELDS}
+    characters(sort: ROLE, perPage: 12) {
+      edges {
+        role
+        node {
+          id
+          name { full native }
+          image { large medium }
+          description
+          gender
+          age
+        }
+      }
+    }
+    relations {
+      edges {
+        relationType
+        node {
+          id
+          title { romaji english }
+          coverImage { large }
+          format
+          type
+        }
+      }
     }
   }
 }`;
@@ -81,9 +97,11 @@ export interface AniMedia {
   meanScore: number | null;
   trending: number;
   nextAiringEpisode: { airingAt: number; episode: number } | null;
+  characters?: { edges: any[] };
+  relations?: { edges: any[] };
 }
 
-async function query(q: string, variables: Record<string, unknown>): Promise<{ Page: { media: AniMedia[] } }> {
+async function query(q: string, variables: Record<string, unknown>): Promise<any> {
   const res = await fetch(ANILIST_URL, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -95,17 +113,22 @@ async function query(q: string, variables: Record<string, unknown>): Promise<{ P
 
 export async function getTrending(type: "MANGA" | "ANIME" = "MANGA", page = 1, perPage = 20) {
   const data = await query(TRENDING_QUERY, { page, perPage, type });
-  return data.Page.media;
+  return data.Page.media as AniMedia[];
 }
 
 export async function getPopular(type: "MANGA" | "ANIME" = "MANGA", page = 1, perPage = 20) {
   const data = await query(POPULAR_QUERY, { page, perPage, type });
-  return data.Page.media;
+  return data.Page.media as AniMedia[];
 }
 
 export async function searchMedia(search: string, type: "MANGA" | "ANIME" = "MANGA", page = 1, perPage = 20) {
   const data = await query(SEARCH_QUERY, { search, type, page, perPage });
-  return data.Page.media;
+  return data.Page.media as AniMedia[];
+}
+
+export async function getMediaById(id: number): Promise<AniMedia | null> {
+  const data = await query(DETAIL_QUERY, { id });
+  return data?.Media || null;
 }
 
 export function getTitle(media: AniMedia): string {
