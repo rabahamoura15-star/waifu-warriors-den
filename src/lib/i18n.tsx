@@ -253,6 +253,9 @@ const translations: Record<Language, Record<string, string>> = {
     letsGo: "🔥 C'est parti!",
     availableNow: "Disponible maintenant!",
     language: "Langue",
+    dailyQuests: "Quêtes Quotidiennes",
+    login: "Se connecter",
+    logout: "Déconnexion",
   },
   pt: {
     home: "Início",
