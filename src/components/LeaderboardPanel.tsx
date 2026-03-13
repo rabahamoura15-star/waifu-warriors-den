@@ -1,30 +1,31 @@
 import { motion } from "framer-motion";
-import { Trophy, Crown, Medal, Clock, Flame } from "lucide-react";
+import { Trophy, Crown, Medal, Clock } from "lucide-react";
 import { getRankColor, type Rank } from "@/lib/gamification";
 import { useI18n } from "@/lib/i18n";
+import championImg from "@/assets/champion-badge.png";
 
 const leaderboard = [
-  { name: "ShadowMonarch", rank: "SSS" as Rank, xp: 125000, avatar: "👑" },
-  { name: "BerserkReader", rank: "SS" as Rank, xp: 88000, avatar: "⚔️" },
-  { name: "ManhwaAddict", rank: "SS" as Rank, xp: 72000, avatar: "📖" },
-  { name: "AnimeGod", rank: "S" as Rank, xp: 45000, avatar: "🌟" },
-  { name: "DarkKnight", rank: "S" as Rank, xp: 38000, avatar: "🗡️" },
-  { name: "OtakuLord", rank: "A" as Rank, xp: 15000, avatar: "🎭" },
-  { name: "MangaHunter", rank: "A" as Rank, xp: 12000, avatar: "🏹" },
-  { name: "WebtoonFan", rank: "B" as Rank, xp: 8500, avatar: "📱" },
+  { name: "ShadowMonarch", rank: "SSS" as Rank, xp: 125000 },
+  { name: "BerserkReader", rank: "SS" as Rank, xp: 88000 },
+  { name: "ManhwaAddict", rank: "SS" as Rank, xp: 72000 },
+  { name: "AnimeGod", rank: "S" as Rank, xp: 45000 },
+  { name: "DarkKnight", rank: "S" as Rank, xp: 38000 },
+  { name: "OtakuLord", rank: "A" as Rank, xp: 15000 },
+  { name: "MangaHunter", rank: "A" as Rank, xp: 12000 },
+  { name: "WebtoonFan", rank: "B" as Rank, xp: 8500 },
 ];
 
 const weeklyTimeBoard = [
-  { name: "ShadowMonarch", hours: 47.5, avatar: "👑", isChampion: true },
-  { name: "NightReader", hours: 42.3, avatar: "🌙" },
-  { name: "BerserkReader", hours: 38.1, avatar: "⚔️" },
-  { name: "ManhwaAddict", hours: 35.8, avatar: "📖" },
-  { name: "DarkKnight", hours: 31.2, avatar: "🗡️" },
-  { name: "OtakuLord", hours: 28.7, avatar: "🎭" },
-  { name: "AnimeGod", hours: 25.4, avatar: "🌟" },
-  { name: "WebtoonFan", hours: 22.1, avatar: "📱" },
-  { name: "MangaHunter", hours: 19.6, avatar: "🏹" },
-  { name: "ReadingKing", hours: 17.3, avatar: "📚" },
+  { name: "ShadowMonarch", hours: 47.5, isChampion: true },
+  { name: "NightReader", hours: 42.3 },
+  { name: "BerserkReader", hours: 38.1 },
+  { name: "ManhwaAddict", hours: 35.8 },
+  { name: "DarkKnight", hours: 31.2 },
+  { name: "OtakuLord", hours: 28.7 },
+  { name: "AnimeGod", hours: 25.4 },
+  { name: "WebtoonFan", hours: 22.1 },
+  { name: "MangaHunter", hours: 19.6 },
+  { name: "ReadingKing", hours: 17.3 },
 ];
 
 const posIcons = [
@@ -46,18 +47,18 @@ export default function LeaderboardPanel() {
       >
         <p className="text-xs text-gold font-bold">{t("top1Banner")}</p>
         <div className="flex items-center justify-center gap-3">
-          <span className="text-4xl">👑</span>
+          <img src={championImg} alt="" className="w-10 h-10 object-contain" />
           <div>
             <p className="font-display font-bold text-xl md:text-2xl text-gold">ShadowMonarch</p>
             <p className="text-xs text-muted-foreground flex items-center gap-1 justify-center">
               <Clock size={10} />
-              47.5h {t("day") === "يوم" ? "هذا الأسبوع" : "this week"}
+              47.5h {t("weeklyTimeBoard").includes("الأكثر") ? "هذا الأسبوع" : "this week"}
             </p>
           </div>
-          <span className="text-4xl">👑</span>
+          <img src={championImg} alt="" className="w-10 h-10 object-contain" />
         </div>
         <div className="inline-block px-4 py-1 rounded-full gradient-gold text-xs font-bold text-gold-foreground">
-          🏆 {t("day") === "يوم" ? "بانر بطل الأسبوع" : "Champion Banner Active"}
+          {t("top1Banner")}
         </div>
       </motion.div>
 
@@ -81,7 +82,9 @@ export default function LeaderboardPanel() {
               <span className="w-7 md:w-8 text-center font-display font-bold text-sm md:text-lg text-muted-foreground">
                 {i < 3 ? posIcons[i] : i + 1}
               </span>
-              <span className="text-xl md:text-2xl">{user.avatar}</span>
+              <div className="w-8 h-8 rounded-full gradient-rank flex items-center justify-center text-primary-foreground font-bold text-xs">
+                {user.name.charAt(0)}
+              </div>
               <div className="flex-1 min-w-0">
                 <p className="font-bold text-xs md:text-sm text-foreground truncate">{user.name}</p>
                 <p className="text-[10px] md:text-xs text-muted-foreground flex items-center gap-1">
@@ -89,9 +92,7 @@ export default function LeaderboardPanel() {
                 </p>
               </div>
               {i === 0 && (
-                <span className="text-[10px] px-2 py-0.5 rounded-full gradient-gold text-gold-foreground font-bold">
-                  🏆
-                </span>
+                <img src={championImg} alt="" className="w-6 h-6 object-contain" />
               )}
             </motion.div>
           ))}
@@ -118,7 +119,9 @@ export default function LeaderboardPanel() {
               <span className="w-7 md:w-8 text-center font-display font-bold text-sm md:text-lg text-muted-foreground">
                 {i < 3 ? posIcons[i] : i + 1}
               </span>
-              <span className="text-xl md:text-2xl">{user.avatar}</span>
+              <div className="w-8 h-8 rounded-full gradient-purple flex items-center justify-center text-primary-foreground font-bold text-xs">
+                {user.name.charAt(0)}
+              </div>
               <div className="flex-1 min-w-0">
                 <p className="font-bold text-xs md:text-sm text-foreground truncate">{user.name}</p>
                 <p className="text-[10px] md:text-xs text-muted-foreground">{user.xp.toLocaleString()} XP</p>

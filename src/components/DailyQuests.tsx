@@ -1,17 +1,20 @@
 import { motion } from "framer-motion";
 import { Check, Coins, Star } from "lucide-react";
 import type { Quest } from "@/lib/gamification";
+import { useI18n } from "@/lib/i18n";
 
 interface DailyQuestsProps {
   quests: Quest[];
 }
 
 export default function DailyQuests({ quests }: DailyQuestsProps) {
+  const { t } = useI18n();
+
   return (
     <div className="glass rounded-xl p-4 space-y-3">
       <h3 className="font-display font-bold text-foreground flex items-center gap-2">
-        <span className="text-lg">⚔️</span>
-        المهمات اليومية
+        <Coins size={16} className="text-gold" />
+        {t("dailyQuests")}
       </h3>
       <div className="space-y-2">
         {quests.map((q, i) => {
@@ -26,7 +29,9 @@ export default function DailyQuests({ quests }: DailyQuestsProps) {
                 done ? "bg-primary/10 border border-primary/20" : "bg-secondary"
               }`}
             >
-              <span className="text-xl">{q.icon}</span>
+              <div className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center">
+                <span className="text-sm">{q.icon}</span>
+              </div>
               <div className="flex-1 min-w-0">
                 <p className={`text-sm font-bold ${done ? "text-primary" : "text-foreground"}`}>{q.title}</p>
                 <div className="flex items-center gap-2 mt-1">
