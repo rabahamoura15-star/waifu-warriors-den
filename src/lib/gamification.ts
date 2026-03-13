@@ -133,11 +133,15 @@ export function getRarityColor(rarity: GachaCard["rarity"]): string {
   }
 }
 
-// SSR is nearly impossible — 1%
+// Gacha probabilities (true rates):
+// - SSR: 1%
+// - Epic: 9%
+// - Rare: 20%
+// - Normal: 70%
 export function rollGacha(): GachaCard["rarity"] {
   const r = Math.random();
   if (r < 0.01) return "SSR";
-  if (r < 0.06) return "Epic";
-  if (r < 0.20) return "Rare";
+  if (r < 0.10) return "Epic";
+  if (r < 0.30) return "Rare";
   return "Normal";
 }
