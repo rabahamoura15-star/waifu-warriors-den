@@ -34,6 +34,7 @@ export interface GachaCard {
 export interface Quest {
   id: string;
   title: string;
+  titleEn: string;
   description: string;
   xpReward: number;
   coinReward: number;
@@ -42,21 +43,22 @@ export interface Quest {
   icon: string;
 }
 
-// HELLISH XP curve — exponential growth
+// HELLISH XP curve — exponential growth  
+// Level 10 = 31,623 XP | Level 20 = 178,885 XP | Level 50 = 1,767,767 XP
 const RANK_THRESHOLDS: { rank: Rank; minXP: number }[] = [
-  { rank: "SSS", minXP: 500000 },
-  { rank: "SS", minXP: 200000 },
-  { rank: "S", minXP: 80000 },
-  { rank: "A", minXP: 35000 },
-  { rank: "B", minXP: 15000 },
-  { rank: "C", minXP: 5000 },
-  { rank: "D", minXP: 1500 },
+  { rank: "SSS", minXP: 2000000 },
+  { rank: "SS", minXP: 800000 },
+  { rank: "S", minXP: 300000 },
+  { rank: "A", minXP: 100000 },
+  { rank: "B", minXP: 30000 },
+  { rank: "C", minXP: 8000 },
+  { rank: "D", minXP: 2000 },
   { rank: "E", minXP: 0 },
 ];
 
-// Level XP requirement = level^2.5 * 100
+// Level XP requirement = level^3 * 50 (even harder than before)
 export function getXPForLevel(level: number): number {
-  return Math.floor(Math.pow(level, 2.5) * 100);
+  return Math.floor(Math.pow(level, 3) * 50);
 }
 
 export function getLevelFromXP(xp: number): number {
@@ -76,7 +78,7 @@ export function getNextRankXP(xp: number): number {
   for (let i = RANK_THRESHOLDS.length - 1; i >= 0; i--) {
     if (xp < RANK_THRESHOLDS[i].minXP) return RANK_THRESHOLDS[i].minXP;
   }
-  return 500000;
+  return 2000000;
 }
 
 export function getRankColor(rank: Rank): string {
@@ -95,13 +97,13 @@ export function getRankColor(rank: Rank): string {
 
 export function getDefaultPlayer(): PlayerState {
   return {
-    xp: 1250,
-    coins: 340,
+    xp: 450,
+    coins: 80,
     energy: 65,
     maxEnergy: 100,
-    rank: "D",
-    level: 7,
-    streak: 3,
+    rank: "E",
+    level: 2,
+    streak: 1,
     cards: [],
     readingList: [],
     questsCompleted: [],
@@ -109,16 +111,16 @@ export function getDefaultPlayer(): PlayerState {
   };
 }
 
-// Coin rewards are tiny — grinding is required
+// ENGAGEMENT-BASED quests (no chapter reading since site doesn't host content)
 export function getDailyQuests(): Quest[] {
   return [
-    { id: "q1", title: "قم بتسجيل الدخول", description: "سجل دخولك اليومي", xpReward: 25, coinReward: 3, progress: 1, target: 1, icon: "🔑" },
-    { id: "q2", title: "اقرأ 5 فصول", description: "اقرأ 5 فصول من أي عمل", xpReward: 50, coinReward: 8, progress: 1, target: 5, icon: "📖" },
-    { id: "q3", title: "أضف عمل للقائمة", description: "أضف عملاً جديداً لقائمة القراءة", xpReward: 15, coinReward: 2, progress: 0, target: 1, icon: "📝" },
-    { id: "q4", title: "استخدم البحث الذكي", description: "ابحث عن عمل باستخدام الوصف", xpReward: 20, coinReward: 5, progress: 0, target: 1, icon: "🔍" },
-    { id: "q5", title: "اسحب بطاقة", description: "قم بسحب بطاقة واحدة من الـ Gacha", xpReward: 10, coinReward: 0, progress: 0, target: 1, icon: "🎴" },
-    { id: "q6", title: "تواجد لمدة 30 دقيقة", description: "ابقَ متصلاً لمدة 30 دقيقة", xpReward: 30, coinReward: 5, progress: 0, target: 30, icon: "⏱️" },
-    { id: "q7", title: "شارك في غارة", description: "انضم لغارة واحدة على الأقل", xpReward: 40, coinReward: 10, progress: 0, target: 1, icon: "⚔️" },
+    { id: "q1", title: "سجّل دخولك اليومي", titleEn: "Daily Login", description: "", xpReward: 10, coinReward: 2, progress: 1, target: 1, icon: "🔑" },
+    { id: "q2", title: "ابقَ نشطاً 15 دقيقة", titleEn: "Stay active 15 min", description: "", xpReward: 20, coinReward: 3, progress: 0, target: 15, icon: "⏱️" },
+    { id: "q3", title: "حدّث 3 أعمال في مكتبتك", titleEn: "Update 3 library items", description: "", xpReward: 15, coinReward: 3, progress: 0, target: 3, icon: "📝" },
+    { id: "q4", title: "اسحب بطاقة من الاستدعاء", titleEn: "Pull a Gacha card", description: "", xpReward: 5, coinReward: 0, progress: 0, target: 1, icon: "🎴" },
+    { id: "q5", title: "تحدث مع المرافق الذكي", titleEn: "Chat with Shadow Companion", description: "", xpReward: 10, coinReward: 2, progress: 0, target: 1, icon: "💬" },
+    { id: "q6", title: "تصفّح المتجر أو السوق السوداء", titleEn: "Browse Shop or Black Market", description: "", xpReward: 5, coinReward: 1, progress: 0, target: 1, icon: "🛒" },
+    { id: "q7", title: "استخدم البحث الذكي", titleEn: "Use Smart Search", description: "", xpReward: 10, coinReward: 2, progress: 0, target: 1, icon: "🔍" },
   ];
 }
 
@@ -131,11 +133,11 @@ export function getRarityColor(rarity: GachaCard["rarity"]): string {
   }
 }
 
-// SSR is nearly impossible
+// SSR is nearly impossible — 1%
 export function rollGacha(): GachaCard["rarity"] {
   const r = Math.random();
-  if (r < 0.01) return "SSR";     // 1%
-  if (r < 0.06) return "Epic";    // 5%
-  if (r < 0.20) return "Rare";    // 14%
-  return "Normal";                 // 80%
+  if (r < 0.01) return "SSR";
+  if (r < 0.06) return "Epic";
+  if (r < 0.20) return "Rare";
+  return "Normal";
 }
