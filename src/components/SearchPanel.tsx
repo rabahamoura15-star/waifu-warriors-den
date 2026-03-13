@@ -1,9 +1,11 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { motion } from "framer-motion";
 import { Search, Loader2, Sparkles } from "lucide-react";
 import { searchMedia, type AniMedia } from "@/lib/anilist";
 import { jikanSearch } from "@/lib/jikan";
 import { mangadexSearch } from "@/lib/mangadex";
+import { useAuth } from "@/lib/auth-context";
+import { filterNsfwMedia } from "@/lib/nsfw";
 import MediaCard from "./MediaCard";
 import { useI18n } from "@/lib/i18n";
 
@@ -13,6 +15,8 @@ export default function SearchPanel() {
   const [loading, setLoading] = useState(false);
   const [type, setType] = useState<"MANGA" | "ANIME">("MANGA");
   const { t, dir } = useI18n();
+  const { nsfwFilterEnabled } = useAuth();
+  const filteredResults = useMemo(() => filterNsfwMedia(results, nsfwFilterEnabled), [results, nsfwFilterEnabled]);
 
   const handleSearch = async () => {
     if (!query.trim()) return;
@@ -20,21 +24,21 @@ export default function SearchPanel() {
     try {
       if (type === "MANGA") {
         // Try MangaDex first for manga
-        const data = await mangadexSearch(query, 20);
+        const data = await mangadexSearch(query, 20, nsfwFilterEnabled);
         setResults(data);
       } else {
         // Use AniList for anime
-        const data = await searchMedia(query, type, 1, 20);
+        const data = await searchMedia(query, type, 1, 20, nsfwFilterEnabled);
         setResults(data);
       }
     } catch (e) {
       console.warn("Primary API failed, falling back:", e);
       try {
         if (type === "MANGA") {
-          const fallback = await jikanSearch(query, "manga", 20);
+          const fallback = await jikanSearch(query, "manga", 20, nsfwFilterEnabled);
           setResults(fallback as AniMedia[]);
         } else {
-          const fallback = await jikanSearch(query, "anime", 20);
+          const fallback = await jikanSearch(query, "anime", 20, nsfwFilterEnabled);
           setResults(fallback as AniMedia[]);
         }
       } catch (e2) {
@@ -90,19 +94,19 @@ export default function SearchPanel() {
         </button>
       </div>
 
-      {results.length > 0 && (
+      {filteredResults.length > 0 && (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4"
         >
-          {results.map((m, i) => (
+          {filteredResults.map((m, i) => (
             <MediaCard key={m.id} media={m} index={i} />
           ))}
         </motion.div>
       )}
 
-      {results.length === 0 && !loading && query && (
+      {filteredResults.length === 0 && !loading && query && (
         <div className="text-center py-12 text-muted-foreground">{t("noResults")}</div>
       )}
     </div>

@@ -1,11 +1,13 @@
 import { createContext, useContext, useState, useEffect, type ReactNode } from "react";
-import { auth, onAuthStateChanged, type User, getPlayerProfile, type PlayerProfile } from "./firebase";
+import { auth, onAuthStateChanged, type User, getPlayerProfile, type PlayerProfile, updatePlayerField } from "./firebase";
 
 interface AuthContextType {
   user: User | null;
   profile: PlayerProfile | null;
   loading: boolean;
   setProfile: (p: PlayerProfile | null) => void;
+  nsfwFilterEnabled: boolean;
+  setNsfwFilterEnabled: (enabled: boolean) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -13,6 +15,8 @@ const AuthContext = createContext<AuthContextType>({
   profile: null,
   loading: true,
   setProfile: () => {},
+  nsfwFilterEnabled: true,
+  setNsfwFilterEnabled: async () => {},
 });
 
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -25,7 +29,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setUser(u);
       if (u) {
         const p = await getPlayerProfile(u.uid);
-        setProfile(p);
+        // Ensure new users or older profiles have the NSFW filter setting.
+        if (p && typeof p.nsfwFilterEnabled === "undefined") {
+          updatePlayerField(u.uid, { nsfwFilterEnabled: true }).catch(() => {
+            // ignore
+          });
+          setProfile({ ...p, nsfwFilterEnabled: true });
+        } else {
+          setProfile(p);
+        }
       } else {
         setProfile(null);
       }
@@ -34,8 +46,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return unsub;
   }, []);
 
+  const nsfwFilterEnabled = profile?.nsfwFilterEnabled ?? true;
+
+  const setNsfwFilterEnabled = async (enabled: boolean) => {
+    if (!user) return;
+    try {
+      await updatePlayerField(user.uid, { nsfwFilterEnabled: enabled });
+      setProfile((prev) => (prev ? { ...prev, nsfwFilterEnabled: enabled } : prev));
+    } catch {
+      // ignore
+    }
+  };
+
   return (
-    <AuthContext.Provider value={{ user, profile, loading, setProfile }}>
+    <AuthContext.Provider
+      value={{ user, profile, loading, setProfile, nsfwFilterEnabled, setNsfwFilterEnabled }}
+    >
       {children}
     </AuthContext.Provider>
   );

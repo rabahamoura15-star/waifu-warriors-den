@@ -86,14 +86,33 @@ function toAniMedia(manga: MangaDexManga): import("@/lib/anilist").AniMedia {
   };
 }
 
-export async function mangadexTrending(limit = 20): Promise<import("@/lib/anilist").AniMedia[]> {
-  const data = await mangadexFetch(`/manga?limit=${limit}&order[followedCount]=desc&contentRating[]=safe&contentRating[]=suggestive&includes[]=cover_art`);
+export async function mangadexTrending(
+  limit = 20,
+  filterNsfw = true,
+): Promise<import("@/lib/anilist").AniMedia[]> {
+  const contentRatings = filterNsfw
+    ? ["safe", "suggestive"]
+    : ["safe", "suggestive", "erotica", "pornographic"];
+  const ratingParams = contentRatings.map((r) => `contentRating[]=${encodeURIComponent(r)}`).join("&");
+  const data = await mangadexFetch(
+    `/manga?limit=${limit}&order[followedCount]=desc&${ratingParams}&includes[]=cover_art`,
+  );
   const mangas = (data as { data: MangaDexManga[] }).data;
   return mangas.map(toAniMedia);
 }
 
-export async function mangadexSearch(query: string, limit = 20): Promise<import("@/lib/anilist").AniMedia[]> {
-  const data = await mangadexFetch(`/manga?title=${encodeURIComponent(query)}&limit=${limit}&contentRating[]=safe&contentRating[]=suggestive&includes[]=cover_art`);
+export async function mangadexSearch(
+  query: string,
+  limit = 20,
+  filterNsfw = true,
+): Promise<import("@/lib/anilist").AniMedia[]> {
+  const contentRatings = filterNsfw
+    ? ["safe", "suggestive"]
+    : ["safe", "suggestive", "erotica", "pornographic"];
+  const ratingParams = contentRatings.map((r) => `contentRating[]=${encodeURIComponent(r)}`).join("&");
+  const data = await mangadexFetch(
+    `/manga?title=${encodeURIComponent(query)}&limit=${limit}&${ratingParams}&includes[]=cover_art`,
+  );
   const mangas = (data as { data: MangaDexManga[] }).data;
   return mangas.map(toAniMedia);
 }

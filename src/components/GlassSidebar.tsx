@@ -18,6 +18,7 @@ const navItems = [
   { id: "market", icon: ShoppingBag, labelKey: "market" },
   { id: "leaderboard", icon: Trophy, labelKey: "leaderboard" },
   { id: "schedule", icon: Flame, labelKey: "schedule" },
+  { id: "settings", icon: Settings, labelKey: "settings" },
 ];
 
 export default function GlassSidebar({ activeTab, onTabChange }: SidebarProps) {
@@ -218,7 +219,14 @@ export default function GlassSidebar({ activeTab, onTabChange }: SidebarProps) {
         </AnimatePresence>
       </div>
 
-      <button className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary transition-all w-full mx-3">
+      <button
+        onClick={() => onTabChange("settings")}
+        className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all w-full mx-3 ${
+          activeTab === "settings"
+            ? "bg-primary/20 text-primary"
+            : "text-muted-foreground hover:text-foreground hover:bg-secondary"
+        }`}
+      >
         <Settings size={20} className="shrink-0" />
         <AnimatePresence>
           {!collapsed && (

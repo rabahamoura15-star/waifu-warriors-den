@@ -59,13 +59,24 @@ function toAniMedia(j: JikanMedia): AniMedia {
   };
 }
 
-export async function jikanTrending(type: "manga" | "anime" = "manga", limit = 20) {
-  const data = await jikanFetch(`/top/${type}?filter=bypopularity&limit=${limit}`);
+export async function jikanTrending(
+  type: "manga" | "anime" = "manga",
+  limit = 20,
+  filterNsfw = true,
+) {
+  const sfwParam = filterNsfw ? "&sfw=true" : "&sfw=false";
+  const data = await jikanFetch(`/top/${type}?filter=bypopularity&limit=${limit}${sfwParam}`);
   return (data.data as JikanMedia[]).map(toAniMedia);
 }
 
-export async function jikanSearch(q: string, type: "manga" | "anime" = "manga", limit = 20) {
-  const data = await jikanFetch(`/${type}?q=${encodeURIComponent(q)}&limit=${limit}&sfw=true`);
+export async function jikanSearch(
+  q: string,
+  type: "manga" | "anime" = "manga",
+  limit = 20,
+  filterNsfw = true,
+) {
+  const sfwParam = filterNsfw ? "&sfw=true" : "&sfw=false";
+  const data = await jikanFetch(`/${type}?q=${encodeURIComponent(q)}&limit=${limit}${sfwParam}`);
   return (data.data as JikanMedia[]).map(toAniMedia);
 }
 

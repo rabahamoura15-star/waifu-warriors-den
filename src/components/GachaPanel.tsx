@@ -3,6 +3,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Star, Coins, Sparkles } from "lucide-react";
 import { rollGacha, type GachaCard } from "@/lib/gamification";
 import { useI18n } from "@/lib/i18n";
+import { useAuth } from "@/lib/auth-context";
+import { filterNsfwMedia } from "@/lib/nsfw";
 import { mangadexTrending } from "@/lib/mangadex";
 import { getTrending } from "@/lib/anilist";
 import summonGateImg from "@/assets/summon-gate.png";
@@ -29,24 +31,27 @@ export default function GachaPanel() {
   const [coins, setCoins] = useState(340);
   const [covers, setCovers] = useState<{ cover: string; title: string }[]>([]);
   const { t } = useI18n();
+  const { nsfwFilterEnabled } = useAuth();
 
   useEffect(() => {
     const loadCovers = async () => {
       try {
         // Try MangaDex first
-        const mangas = await mangadexTrending(10);
-        const newCovers = mangas.map(m => ({
+        const mangas = await mangadexTrending(10, nsfwFilterEnabled);
+        const filtered = filterNsfwMedia(mangas, nsfwFilterEnabled);
+        const newCovers = filtered.map((m) => ({
           cover: m.coverImage.extraLarge,
-          title: m.title.english || m.title.romaji || '',
+          title: m.title.english || m.title.romaji || "",
         }));
         setCovers(newCovers);
       } catch {
         try {
           // Fallback to AniList
-          const mangas = await getTrending("MANGA", 1, 10);
-          const newCovers = mangas.map(m => ({
+          const mangas = await getTrending("MANGA", 1, 10, nsfwFilterEnabled);
+          const filtered = filterNsfwMedia(mangas, nsfwFilterEnabled);
+          const newCovers = filtered.map((m) => ({
             cover: m.coverImage.extraLarge,
-            title: m.title.english || m.title.romaji || '',
+            title: m.title.english || m.title.romaji || "",
           }));
           setCovers(newCovers);
         } catch {
@@ -61,7 +66,7 @@ export default function GachaPanel() {
       }
     };
     loadCovers();
-  }, []);
+  }, [nsfwFilterEnabled]);
 
   const pull = () => {
     if (coins < GACHA_COST || pulling || covers.length === 0) return;

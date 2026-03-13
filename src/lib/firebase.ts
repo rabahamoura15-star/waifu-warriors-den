@@ -69,6 +69,7 @@ export interface PlayerProfile {
   questsCompleted: string[];
   totalTimeMinutes: number;
   weeklyTimeMinutes: number;
+  nsfwFilterEnabled: boolean;
   lastLogin: FieldValue | null;
   createdAt: FieldValue | null;
 }
@@ -94,6 +95,7 @@ export async function createPlayerProfile(uid: string, nickname: string): Promis
     questsCompleted: [],
     totalTimeMinutes: 0,
     weeklyTimeMinutes: 0,
+    nsfwFilterEnabled: true,
     lastLogin: serverTimestamp(),
     createdAt: serverTimestamp(),
   });

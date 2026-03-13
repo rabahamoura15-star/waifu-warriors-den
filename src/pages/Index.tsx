@@ -7,6 +7,7 @@ import { getDefaultPlayer, getDailyQuests } from "@/lib/gamification";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useI18n } from "@/lib/i18n";
 import { useAuth } from "@/lib/auth-context";
+import { filterNsfwMedia } from "@/lib/nsfw";
 import GlassSidebar from "@/components/GlassSidebar";
 import HeroSection from "@/components/HeroSection";
 import MediaRow from "@/components/MediaRow";
@@ -20,6 +21,7 @@ import SchedulePanel from "@/components/SchedulePanel";
 import LeaderboardPanel from "@/components/LeaderboardPanel";
 import ArenaPanel from "@/components/ArenaPanel";
 import MarketPanel from "@/components/MarketPanel";
+import SettingsPanel from "@/components/SettingsPanel";
 import AuthModal from "@/components/AuthModal";
 import { LogIn, LogOut } from "lucide-react";
 import { signOut } from "@/lib/firebase";
@@ -27,7 +29,7 @@ import { signOut } from "@/lib/firebase";
 export default function Index() {
   const [activeTab, setActiveTab] = useState("home");
   const [authOpen, setAuthOpen] = useState(false);
-  const { user, profile } = useAuth();
+  const { user, profile, nsfwFilterEnabled } = useAuth();
   const player = useMemo(() => {
     if (profile) {
       return {
@@ -52,52 +54,67 @@ export default function Index() {
 
   // Manga data from multiple APIs
   const { data: trendingManga, isLoading: loadingTrending } = useQuery({
-    queryKey: ["trending-manga"],
+    queryKey: ["trending-manga", nsfwFilterEnabled],
     queryFn: async () => {
       try {
         // Try MangaDex first for manga
-        return await mangadexTrending(20);
+        return await mangadexTrending(20, nsfwFilterEnabled);
       } catch {
         try {
-          return await anilistTrending("MANGA", 1, 20);
+          return await anilistTrending("MANGA", 1, 20, nsfwFilterEnabled);
         } catch {
-          return await jikanTrending("manga", 20);
+          return await jikanTrending("manga", 20, nsfwFilterEnabled);
         }
       }
     },
   });
 
   const { data: popularManga, isLoading: loadingPopular } = useQuery({
-    queryKey: ["popular-manga"],
+    queryKey: ["popular-manga", nsfwFilterEnabled],
     queryFn: async () => {
       try {
         // Try MangaDex for popular manga
-        return await mangadexTrending(20); // MangaDex trending is by followed count
+        return await mangadexTrending(20, nsfwFilterEnabled); // MangaDex trending is by followed count
       } catch {
         try {
-          return await anilistPopular("MANGA", 1, 20);
+          return await anilistPopular("MANGA", 1, 20, nsfwFilterEnabled);
         } catch {
-          return await jikanTrending("manga", 20);
+          return await jikanTrending("manga", 20, nsfwFilterEnabled);
         }
       }
     },
   });
 
   const { data: trendingAnime, isLoading: loadingAnime } = useQuery({
-    queryKey: ["trending-anime"],
+    queryKey: ["trending-anime", nsfwFilterEnabled],
     queryFn: async () => {
       try {
-        return await getTrending("ANIME", 1, 15);
+        return await getTrending("ANIME", 1, 15, nsfwFilterEnabled);
       } catch {
-        return await jikanTrending("anime", 15);
+        return await jikanTrending("anime", 15, nsfwFilterEnabled);
       }
     },
   });
 
+  const filteredTrendingManga = useMemo(
+    () => filterNsfwMedia(trendingManga, nsfwFilterEnabled),
+    [trendingManga, nsfwFilterEnabled],
+  );
+
+  const filteredPopularManga = useMemo(
+    () => filterNsfwMedia(popularManga, nsfwFilterEnabled),
+    [popularManga, nsfwFilterEnabled],
+  );
+
+  const filteredTrendingAnime = useMemo(
+    () => filterNsfwMedia(trendingAnime, nsfwFilterEnabled),
+    [trendingAnime, nsfwFilterEnabled],
+  );
+
   const heroMedia = useMemo(() => {
-    if (!trendingManga?.length) return null;
-    return trendingManga[Math.floor(Math.random() * Math.min(5, trendingManga.length))];
-  }, [trendingManga]);
+    if (!filteredTrendingManga?.length) return null;
+    return filteredTrendingManga[Math.floor(Math.random() * Math.min(5, filteredTrendingManga.length))];
+  }, [filteredTrendingManga]);
 
   const renderContent = () => {
     switch (activeTab) {
@@ -113,6 +130,8 @@ export default function Index() {
         return <ArenaPanel />;
       case "market":
         return <MarketPanel />;
+      case "settings":
+        return <SettingsPanel />;
       case "tracker":
         return (
           <div className="space-y-4">
@@ -127,9 +146,9 @@ export default function Index() {
         return (
           <div className="space-y-6 md:space-y-8">
             <HeroSection media={heroMedia} />
-            <MediaRow title={t("trendingManhwa")} media={trendingManga || []} loading={loadingTrending} />
-            <MediaRow title={t("mostPopular")} media={popularManga || []} loading={loadingPopular} />
-            <MediaRow title={t("trendingAnime")} media={trendingAnime || []} loading={loadingAnime} />
+            <MediaRow title={t("trendingManhwa")} media={filteredTrendingManga || []} loading={loadingTrending} />
+            <MediaRow title={t("mostPopular")} media={filteredPopularManga || []} loading={loadingPopular} />
+            <MediaRow title={t("trendingAnime")} media={filteredTrendingAnime || []} loading={loadingAnime} />
           </div>
         );
     }

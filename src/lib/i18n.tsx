@@ -92,6 +92,10 @@ const translations: Record<Language, Record<string, string>> = {
     dailyQuests: "المهمات اليومية",
     login: "تسجيل الدخول",
     logout: "خروج",
+    settingsDesc: "تحكم في تفضيلات حسابك وفلترة المحتوى.",
+    nsfwFilter: "تصفية المحتوى +18",
+    nsfwFilterDesc: "إخفاء المحتوى البالغ والدموي في نتائج البحث والقوائم.",
+    settingsLoginToChange: "سجّل الدخول لتتمكن من تغيير هذا الإعداد.",
   },
   en: {
     home: "Home",
@@ -174,6 +178,10 @@ const translations: Record<Language, Record<string, string>> = {
     dailyQuests: "Daily Quests",
     login: "Sign In",
     logout: "Logout",
+    settingsDesc: "Manage your account preferences and content filters.",
+    nsfwFilter: "NSFW Filter",
+    nsfwFilterDesc: "Hide adult/violent content in search results and lists.",
+    settingsLoginToChange: "Sign in to change this setting.",
   },
   fr: {
     home: "Accueil",
@@ -256,6 +264,10 @@ const translations: Record<Language, Record<string, string>> = {
     dailyQuests: "Quêtes Quotidiennes",
     login: "Se connecter",
     logout: "Déconnexion",
+    settingsDesc: "Gérez vos préférences de compte et le filtrage du contenu.",
+    nsfwFilter: "Filtre NSFW",
+    nsfwFilterDesc: "Masquer le contenu adulte/violent dans les résultats et listes.",
+    settingsLoginToChange: "Connectez-vous pour modifier ce paramètre.",
   },
   pt: {
     home: "Início",
@@ -338,6 +350,10 @@ const translations: Record<Language, Record<string, string>> = {
     dailyQuests: "Missões Diárias",
     login: "Entrar",
     logout: "Sair",
+    settingsDesc: "Gerencie suas preferências de conta e filtros de conteúdo.",
+    nsfwFilter: "Filtro NSFW",
+    nsfwFilterDesc: "Ocultar conteúdo adulto/violento em resultados de busca e listas.",
+    settingsLoginToChange: "Faça login para alterar esta configuração.",
   },
   hi: {
     home: "होम",
@@ -419,8 +435,10 @@ const translations: Record<Language, Record<string, string>> = {
     language: "भाषा",
     dailyQuests: "दैनिक क्वेस्ट",
     login: "साइन इन",
-    logout: "लॉगआउट",
-  },
+    logout: "लॉगआउट",    settingsDesc: "अपनी अकाउंट प्राथमिकताएं और सामग्री फ़िल्टर प्रबंधित करें।",
+    nsfwFilter: "NSFW फ़िल्टर",
+    nsfwFilterDesc: "खोज परिणामों और सूचियों में वयस्क/हिंसक सामग्री को छिपाएं।",
+    settingsLoginToChange: "यह सेटिंग बदलने के लिए लॉग इन करें।",  },
 };
 
 interface I18nContextType {

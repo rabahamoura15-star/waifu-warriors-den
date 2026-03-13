@@ -21,27 +21,27 @@ const MEDIA_FIELDS = `
 `;
 
 const TRENDING_QUERY = `
-query ($page: Int, $perPage: Int, $type: MediaType) {
+query ($page: Int, $perPage: Int, $type: MediaType, $isAdult: Boolean) {
   Page(page: $page, perPage: $perPage) {
-    media(type: $type, sort: TRENDING_DESC, isAdult: false) {
+    media(type: $type, sort: TRENDING_DESC, isAdult: $isAdult) {
       ${MEDIA_FIELDS}
     }
   }
 }`;
 
 const SEARCH_QUERY = `
-query ($search: String, $type: MediaType, $page: Int, $perPage: Int) {
+query ($search: String, $type: MediaType, $page: Int, $perPage: Int, $isAdult: Boolean) {
   Page(page: $page, perPage: $perPage) {
-    media(search: $search, type: $type, sort: SEARCH_MATCH, isAdult: false) {
+    media(search: $search, type: $type, sort: SEARCH_MATCH, isAdult: $isAdult) {
       ${MEDIA_FIELDS}
     }
   }
 }`;
 
 const POPULAR_QUERY = `
-query ($page: Int, $perPage: Int, $type: MediaType) {
+query ($page: Int, $perPage: Int, $type: MediaType, $isAdult: Boolean) {
   Page(page: $page, perPage: $perPage) {
-    media(type: $type, sort: POPULARITY_DESC, isAdult: false) {
+    media(type: $type, sort: POPULARITY_DESC, isAdult: $isAdult) {
       ${MEDIA_FIELDS}
     }
   }
@@ -135,18 +135,50 @@ async function query<T>(q: string, variables: Record<string, unknown>): Promise<
   return json.data;
 }
 
-export async function getTrending(type: "MANGA" | "ANIME" = "MANGA", page = 1, perPage = 20) {
-  const data = await query(TRENDING_QUERY, { page, perPage, type });
+export async function getTrending(
+  type: "MANGA" | "ANIME" = "MANGA",
+  page = 1,
+  perPage = 20,
+  filterNsfw = true,
+) {
+  const data = await query(TRENDING_QUERY, {
+    page,
+    perPage,
+    type,
+    isAdult: !filterNsfw,
+  });
   return data.Page.media as AniMedia[];
 }
 
-export async function getPopular(type: "MANGA" | "ANIME" = "MANGA", page = 1, perPage = 20) {
-  const data = await query(POPULAR_QUERY, { page, perPage, type });
+export async function getPopular(
+  type: "MANGA" | "ANIME" = "MANGA",
+  page = 1,
+  perPage = 20,
+  filterNsfw = true,
+) {
+  const data = await query(POPULAR_QUERY, {
+    page,
+    perPage,
+    type,
+    isAdult: !filterNsfw,
+  });
   return data.Page.media as AniMedia[];
 }
 
-export async function searchMedia(search: string, type: "MANGA" | "ANIME" = "MANGA", page = 1, perPage = 20) {
-  const data = await query(SEARCH_QUERY, { search, type, page, perPage });
+export async function searchMedia(
+  search: string,
+  type: "MANGA" | "ANIME" = "MANGA",
+  page = 1,
+  perPage = 20,
+  filterNsfw = true,
+) {
+  const data = await query(SEARCH_QUERY, {
+    search,
+    type,
+    page,
+    perPage,
+    isAdult: !filterNsfw,
+  });
   return data.Page.media as AniMedia[];
 }
 
