@@ -89,6 +89,9 @@ const translations: Record<Language, Record<string, string>> = {
     letsGo: "🔥 لنبدأ المغامرة!",
     availableNow: "متاح الآن!",
     language: "اللغة",
+    dailyQuests: "المهمات اليومية",
+    login: "تسجيل الدخول",
+    logout: "خروج",
   },
   en: {
     home: "Home",
