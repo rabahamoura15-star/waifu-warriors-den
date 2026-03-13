@@ -89,6 +89,9 @@ const translations: Record<Language, Record<string, string>> = {
     letsGo: "🔥 لنبدأ المغامرة!",
     availableNow: "متاح الآن!",
     language: "اللغة",
+    dailyQuests: "المهمات اليومية",
+    login: "تسجيل الدخول",
+    logout: "خروج",
   },
   en: {
     home: "Home",
@@ -168,6 +171,9 @@ const translations: Record<Language, Record<string, string>> = {
     letsGo: "🔥 Let's Begin!",
     availableNow: "Available Now!",
     language: "Language",
+    dailyQuests: "Daily Quests",
+    login: "Sign In",
+    logout: "Logout",
   },
   fr: {
     home: "Accueil",
@@ -247,6 +253,9 @@ const translations: Record<Language, Record<string, string>> = {
     letsGo: "🔥 C'est parti!",
     availableNow: "Disponible maintenant!",
     language: "Langue",
+    dailyQuests: "Quêtes Quotidiennes",
+    login: "Se connecter",
+    logout: "Déconnexion",
   },
   pt: {
     home: "Início",
@@ -326,6 +335,9 @@ const translations: Record<Language, Record<string, string>> = {
     letsGo: "🔥 Vamos começar!",
     availableNow: "Disponível agora!",
     language: "Idioma",
+    dailyQuests: "Missões Diárias",
+    login: "Entrar",
+    logout: "Sair",
   },
   hi: {
     home: "होम",
@@ -405,6 +417,9 @@ const translations: Record<Language, Record<string, string>> = {
     letsGo: "🔥 शुरू करें!",
     availableNow: "अभी उपलब्ध!",
     language: "भाषा",
+    dailyQuests: "दैनिक क्वेस्ट",
+    login: "साइन इन",
+    logout: "लॉगआउट",
   },
 };
 

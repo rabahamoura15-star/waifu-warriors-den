@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Clock, Flame } from "lucide-react";
+import { useI18n } from "@/lib/i18n";
 
 interface ScheduleItem {
   title: string;
-  day: string;
+  day: Record<string, string>;
   time: string;
   type: "manhwa" | "manga" | "anime";
   targetDate: Date;
@@ -18,21 +19,22 @@ const getNextDate = (dayOffset: number, hour: number) => {
 };
 
 const scheduleData: ScheduleItem[] = [
-  { title: "Solo Leveling: Ragnarok", day: "الأحد", time: "12:00", type: "manhwa", targetDate: getNextDate(1, 12) },
-  { title: "Omniscient Reader", day: "الاثنين", time: "15:00", type: "manhwa", targetDate: getNextDate(2, 15) },
-  { title: "Tower of God", day: "الثلاثاء", time: "10:00", type: "manhwa", targetDate: getNextDate(3, 10) },
-  { title: "Jujutsu Kaisen", day: "الأربعاء", time: "00:00", type: "manga", targetDate: getNextDate(4, 0) },
-  { title: "One Piece", day: "الخميس", time: "18:00", type: "manga", targetDate: getNextDate(5, 18) },
-  { title: "Blue Lock", day: "الجمعة", time: "14:00", type: "anime", targetDate: getNextDate(6, 14) },
+  { title: "Solo Leveling: Ragnarok", day: { ar: "الأحد", en: "Sunday", fr: "Dimanche", pt: "Domingo", hi: "रविवार" }, time: "12:00", type: "manhwa", targetDate: getNextDate(1, 12) },
+  { title: "Omniscient Reader", day: { ar: "الاثنين", en: "Monday", fr: "Lundi", pt: "Segunda", hi: "सोमवार" }, time: "15:00", type: "manhwa", targetDate: getNextDate(2, 15) },
+  { title: "Tower of God", day: { ar: "الثلاثاء", en: "Tuesday", fr: "Mardi", pt: "Terça", hi: "मंगलवार" }, time: "10:00", type: "manhwa", targetDate: getNextDate(3, 10) },
+  { title: "Jujutsu Kaisen", day: { ar: "الأربعاء", en: "Wednesday", fr: "Mercredi", pt: "Quarta", hi: "बुधवार" }, time: "00:00", type: "manga", targetDate: getNextDate(4, 0) },
+  { title: "One Piece", day: { ar: "الخميس", en: "Thursday", fr: "Jeudi", pt: "Quinta", hi: "गुरुवार" }, time: "18:00", type: "manga", targetDate: getNextDate(5, 18) },
+  { title: "Blue Lock", day: { ar: "الجمعة", en: "Friday", fr: "Vendredi", pt: "Sexta", hi: "शुक्रवार" }, time: "14:00", type: "anime", targetDate: getNextDate(6, 14) },
 ];
 
 function Countdown({ target }: { target: Date }) {
   const [timeLeft, setTimeLeft] = useState("");
+  const { t } = useI18n();
 
   useEffect(() => {
     const update = () => {
       const diff = target.getTime() - Date.now();
-      if (diff <= 0) { setTimeLeft("متاح الآن!"); return; }
+      if (diff <= 0) { setTimeLeft(t("availableNow")); return; }
       const h = Math.floor(diff / 3600000);
       const m = Math.floor((diff % 3600000) / 60000);
       const s = Math.floor((diff % 60000) / 1000);
@@ -41,7 +43,7 @@ function Countdown({ target }: { target: Date }) {
     update();
     const i = setInterval(update, 1000);
     return () => clearInterval(i);
-  }, [target]);
+  }, [target, t]);
 
   return <span className="font-mono text-accent text-glow-cyan font-bold">{timeLeft}</span>;
 }
@@ -53,11 +55,13 @@ const typeColors = {
 };
 
 export default function SchedulePanel() {
+  const { t, lang } = useI18n();
+
   return (
     <div className="space-y-6">
       <h2 className="text-2xl font-display font-bold text-foreground flex items-center gap-2">
         <Flame size={24} className="text-destructive" />
-        جدول الإصدارات
+        {t("scheduleTitle")}
       </h2>
       <div className="space-y-3">
         {scheduleData.map((item, i) => (
@@ -77,7 +81,7 @@ export default function SchedulePanel() {
                 <span className={`text-[10px] px-2 py-0.5 rounded ${typeColors[item.type]}`}>
                   {item.type}
                 </span>
-                <span className="text-xs text-muted-foreground">{item.day} — {item.time}</span>
+                <span className="text-xs text-muted-foreground">{item.day[lang] || item.day.en} — {item.time}</span>
               </div>
             </div>
             <Countdown target={item.targetDate} />
