@@ -417,6 +417,9 @@ const translations: Record<Language, Record<string, string>> = {
     letsGo: "🔥 शुरू करें!",
     availableNow: "अभी उपलब्ध!",
     language: "भाषा",
+    dailyQuests: "दैनिक क्वेस्ट",
+    login: "साइन इन",
+    logout: "लॉगआउट",
   },
 };
 
