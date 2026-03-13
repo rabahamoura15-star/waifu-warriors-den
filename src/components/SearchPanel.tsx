@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { Search, Loader2, Sparkles } from "lucide-react";
 import { searchMedia, type AniMedia } from "@/lib/anilist";
 import { jikanSearch } from "@/lib/jikan";
+import { mangadexSearch } from "@/lib/mangadex";
 import MediaCard from "./MediaCard";
 import { useI18n } from "@/lib/i18n";
 
@@ -17,13 +18,25 @@ export default function SearchPanel() {
     if (!query.trim()) return;
     setLoading(true);
     try {
-      const data = await searchMedia(query, type, 1, 20);
-      setResults(data);
+      if (type === "MANGA") {
+        // Try MangaDex first for manga
+        const data = await mangadexSearch(query, 20);
+        setResults(data);
+      } else {
+        // Use AniList for anime
+        const data = await searchMedia(query, type, 1, 20);
+        setResults(data);
+      }
     } catch (e) {
-      console.warn("AniList search failed, falling back to Jikan:", e);
+      console.warn("Primary API failed, falling back:", e);
       try {
-        const fallback = await jikanSearch(query, type === "MANGA" ? "manga" : "anime", 20);
-        setResults(fallback as AniMedia[]);
+        if (type === "MANGA") {
+          const fallback = await jikanSearch(query, "manga", 20);
+          setResults(fallback as AniMedia[]);
+        } else {
+          const fallback = await jikanSearch(query, "anime", 20);
+          setResults(fallback as AniMedia[]);
+        }
       } catch (e2) {
         console.error("Both APIs failed:", e2);
         setResults([]);

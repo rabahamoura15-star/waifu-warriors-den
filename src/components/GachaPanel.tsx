@@ -1,18 +1,13 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Star, Coins, Sparkles } from "lucide-react";
 import { rollGacha, type GachaCard } from "@/lib/gamification";
 import { useI18n } from "@/lib/i18n";
+import { mangadexTrending } from "@/lib/mangadex";
+import { getTrending } from "@/lib/anilist";
 import summonGateImg from "@/assets/summon-gate.png";
 
 const GACHA_COST = 50;
-
-const mockCovers = [
-  "https://s4.anilist.co/file/anilistcdn/media/manga/cover/large/bx105398-b673Vt5ZSuz3.jpg",
-  "https://s4.anilist.co/file/anilistcdn/media/manga/cover/large/bx127720-ENofqTlHDDKR.jpg",
-  "https://s4.anilist.co/file/anilistcdn/media/manga/cover/large/bx120249-iCFKgMN6FPOk.jpg",
-  "https://s4.anilist.co/file/anilistcdn/media/manga/cover/large/bx101517-FrMcCMdRWk5A.jpg",
-];
 
 const rarityStyles: Record<GachaCard["rarity"], string> = {
   Normal: "border-muted",
@@ -30,20 +25,54 @@ const rarityTextStyles: Record<GachaCard["rarity"], string> = {
 
 export default function GachaPanel() {
   const [pulling, setPulling] = useState(false);
-  const [result, setResult] = useState<{ rarity: GachaCard["rarity"]; cover: string } | null>(null);
+  const [result, setResult] = useState<{ rarity: GachaCard["rarity"]; cover: string; title: string } | null>(null);
   const [coins, setCoins] = useState(340);
+  const [covers, setCovers] = useState<{ cover: string; title: string }[]>([]);
   const { t } = useI18n();
 
+  useEffect(() => {
+    const loadCovers = async () => {
+      try {
+        // Try MangaDex first
+        const mangas = await mangadexTrending(10);
+        const newCovers = mangas.map(m => ({
+          cover: m.coverImage.extraLarge,
+          title: m.title.english || m.title.romaji || '',
+        }));
+        setCovers(newCovers);
+      } catch {
+        try {
+          // Fallback to AniList
+          const mangas = await getTrending("MANGA", 1, 10);
+          const newCovers = mangas.map(m => ({
+            cover: m.coverImage.extraLarge,
+            title: m.title.english || m.title.romaji || '',
+          }));
+          setCovers(newCovers);
+        } catch {
+          // Final fallback to static covers
+          setCovers([
+            { cover: "https://s4.anilist.co/file/anilistcdn/media/manga/cover/large/bx105398-b673Vt5ZSuz3.jpg", title: "Sample Manga 1" },
+            { cover: "https://s4.anilist.co/file/anilistcdn/media/manga/cover/large/bx127720-ENofqTlHDDKR.jpg", title: "Sample Manga 2" },
+            { cover: "https://s4.anilist.co/file/anilistcdn/media/manga/cover/large/bx120249-iCFKgMN6FPOk.jpg", title: "Sample Manga 3" },
+            { cover: "https://s4.anilist.co/file/anilistcdn/media/manga/cover/large/bx101517-FrMcCMdRWk5A.jpg", title: "Sample Manga 4" },
+          ]);
+        }
+      }
+    };
+    loadCovers();
+  }, []);
+
   const pull = () => {
-    if (coins < GACHA_COST || pulling) return;
+    if (coins < GACHA_COST || pulling || covers.length === 0) return;
     setPulling(true);
     setResult(null);
     setCoins((c) => c - GACHA_COST);
 
     setTimeout(() => {
       const rarity = rollGacha();
-      const cover = mockCovers[Math.floor(Math.random() * mockCovers.length)];
-      setResult({ rarity, cover });
+      const randomCover = covers[Math.floor(Math.random() * covers.length)];
+      setResult({ rarity, cover: randomCover.cover, title: randomCover.title });
       setPulling(false);
     }, 2000);
   };
@@ -85,8 +114,11 @@ export default function GachaPanel() {
               >
                 <img src={result.cover} className="w-full h-full object-cover" alt="Gacha card" />
                 <div className="absolute bottom-0 inset-x-0 p-3 bg-gradient-to-t from-background to-transparent">
-                  <p className={`text-center font-display font-bold text-lg ${rarityTextStyles[result.rarity]}`}>
+                  <p className={`text-center font-display font-bold text-sm ${rarityTextStyles[result.rarity]}`}>
                     {result.rarity === "SSR" ? "✦ SSR ✦" : t(result.rarity.toLowerCase())}
+                  </p>
+                  <p className="text-center text-xs text-foreground mt-1 line-clamp-2">
+                    {result.title}
                   </p>
                 </div>
               </motion.div>

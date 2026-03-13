@@ -1,8 +1,8 @@
 import { motion } from "framer-motion";
-import { Star } from "lucide-react";
+import { Star, ExternalLink } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import type { AniMedia } from "@/lib/anilist";
-import { getTitle } from "@/lib/anilist";
+import { getTitle, getGoogleSearchUrl } from "@/lib/anilist";
 
 interface MediaCardProps {
   media: AniMedia;
@@ -34,6 +34,15 @@ export default function MediaCard({ media, index }: MediaCardProps) {
           <Star size={10} className="text-ssr" />
           <span className="text-foreground">{media.averageScore ? (media.averageScore / 10).toFixed(1) : "N/A"}</span>
         </div>
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            window.open(getGoogleSearchUrl(media), '_blank');
+          }}
+          className="absolute top-2 right-2 w-6 h-6 rounded-full bg-primary/80 hover:bg-primary flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+        >
+          <ExternalLink size={12} className="text-primary-foreground" />
+        </button>
       </div>
       <div className="p-2.5 md:p-3 space-y-1">
         <h3 className="text-xs md:text-sm font-bold text-foreground line-clamp-2 leading-tight">{title}</h3>

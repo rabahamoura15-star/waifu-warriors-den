@@ -1,7 +1,8 @@
 import { useState, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { getTrending, getPopular } from "@/lib/anilist";
+import { getTrending as anilistTrending, getPopular as anilistPopular } from "@/lib/anilist";
 import { jikanTrending } from "@/lib/jikan";
+import { mangadexTrending } from "@/lib/mangadex";
 import { getDefaultPlayer, getDailyQuests } from "@/lib/gamification";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useI18n } from "@/lib/i18n";
@@ -49,14 +50,19 @@ export default function Index() {
   const isMobile = useIsMobile();
   const { t, dir, lang } = useI18n();
 
-  // AniList with Jikan fallback
+  // Manga data from multiple APIs
   const { data: trendingManga, isLoading: loadingTrending } = useQuery({
     queryKey: ["trending-manga"],
     queryFn: async () => {
       try {
-        return await getTrending("MANGA", 1, 20);
+        // Try MangaDex first for manga
+        return await mangadexTrending(20);
       } catch {
-        return await jikanTrending("manga", 20);
+        try {
+          return await anilistTrending("MANGA", 1, 20);
+        } catch {
+          return await jikanTrending("manga", 20);
+        }
       }
     },
   });
@@ -65,9 +71,14 @@ export default function Index() {
     queryKey: ["popular-manga"],
     queryFn: async () => {
       try {
-        return await getPopular("MANGA", 1, 20);
+        // Try MangaDex for popular manga
+        return await mangadexTrending(20); // MangaDex trending is by followed count
       } catch {
-        return await jikanTrending("manga", 20);
+        try {
+          return await anilistPopular("MANGA", 1, 20);
+        } catch {
+          return await jikanTrending("manga", 20);
+        }
       }
     },
   });
