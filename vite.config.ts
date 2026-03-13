@@ -14,7 +14,7 @@ export default defineConfig({
       overlay: false,
     },
   },
-  plugins: [react(), componentTagger(), cloudflare()],
+  plugins: [],
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
