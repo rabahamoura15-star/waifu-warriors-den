@@ -3,7 +3,16 @@ import { ShoppingBag, Coins, Clock, Lock, Users } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import lootBoxImg from "@/assets/loot-box.png";
 
-const shopItems = [
+import { Language } from "@/lib/i18n";
+
+type ShopItem = {
+  name: Record<Language, string>;
+  price: number;
+  icon: string;
+  rarity: "normal" | "rare" | "epic" | "ssr";
+};
+
+const shopItems: ShopItem[] = [
   { name: { ar: "تعزيز XP مضاعف (24 ساعة)", en: "Double XP Boost (24h)", fr: "Boost XP x2 (24h)", pt: "Boost XP x2 (24h)", hi: "डबल XP बूस्ट (24h)" }, price: 500, icon: "⚡", rarity: "rare" },
   { name: { ar: "صندوق بطاقات عشوائي", en: "Random Card Box", fr: "Boîte de Cartes", pt: "Caixa de Cartas", hi: "रैंडम कार्ड बॉक्स" }, price: 300, icon: "🎁", rarity: "normal" },
   { name: { ar: "إعادة ملء الطاقة", en: "Energy Refill", fr: "Recharge d'Énergie", pt: "Recarga de Energia", hi: "ऊर्जा रिफिल" }, price: 250, icon: "🔋", rarity: "normal" },
@@ -54,7 +63,7 @@ export default function MarketPanel() {
                 <span className="text-2xl md:text-3xl">{item.icon}</span>
                 <div className="flex-1 min-w-0">
                   <h4 className="font-bold text-xs md:text-sm text-foreground line-clamp-2">
-                    {(item.name as any)[lang] || item.name.en}
+                    {item.name[lang] || item.name.en}
                   </h4>
                   <p className="flex items-center gap-1 mt-1.5 text-xs md:text-sm text-gold font-bold">
                     <Coins size={12} />{item.price}

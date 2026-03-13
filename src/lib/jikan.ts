@@ -1,4 +1,6 @@
 // Jikan API (MyAnimeList) as fallback for AniList
+import type { AniMedia } from "@/lib/anilist";
+
 const JIKAN_URL = "https://api.jikan.moe/v4";
 
 export interface JikanMedia {
@@ -19,7 +21,7 @@ export interface JikanMedia {
   members: number;
 }
 
-async function jikanFetch(path: string): Promise<any> {
+async function jikanFetch(path: string): Promise<unknown> {
   const res = await fetch(`${JIKAN_URL}${path}`);
   if (!res.ok) throw new Error(`Jikan ${res.status}`);
   const data = await res.json();
@@ -27,7 +29,7 @@ async function jikanFetch(path: string): Promise<any> {
 }
 
 // Convert Jikan format to our AniMedia format
-function toAniMedia(j: JikanMedia): any {
+function toAniMedia(j: JikanMedia): AniMedia {
   return {
     id: j.mal_id + 900000, // offset to avoid ID collision with AniList
     title: {
@@ -75,15 +77,31 @@ export async function jikanGetById(id: number, type: "manga" | "anime" = "manga"
   try {
     const chars = await jikanFetch(`/${type}/${realId}/characters`);
     media.characters = {
-      edges: (chars.data || []).slice(0, 12).map((c: any) => ({
-        role: c.role,
-        node: {
-          id: c.character.mal_id,
-          name: { full: c.character.name, native: null },
-          image: { large: c.character.images?.jpg?.image_url, medium: c.character.images?.jpg?.image_url },
-        },
-      })),
+      edges: (chars.data || []).slice(0, 12).map((c) => {
+        const entry = c as {
+          role?: string;
+          character?: {
+            mal_id?: number;
+            name?: string;
+            images?: { jpg?: { image_url?: string } };
+          };
+        };
+
+        return {
+          role: entry.role ?? null,
+          node: {
+            id: entry.character?.mal_id ?? 0,
+            name: { full: entry.character?.name ?? "", native: null },
+            image: {
+              large: entry.character?.images?.jpg?.image_url,
+              medium: entry.character?.images?.jpg?.image_url,
+            },
+          },
+        };
+      }),
     };
-  } catch {}
+  } catch {
+    // Ignore character fetch failures
+  }
   return media;
 }

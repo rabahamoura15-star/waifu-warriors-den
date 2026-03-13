@@ -46,8 +46,9 @@ export default function AuthModal({ open, onClose }: AuthModalProps) {
         await signInEmail(email, password);
         onClose();
       }
-    } catch (err: any) {
-      setError(err.message || "Error");
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err);
+      setError(message || "Error");
     }
     setLoading(false);
   };
@@ -67,8 +68,9 @@ export default function AuthModal({ open, onClose }: AuthModalProps) {
         return;
       }
       onClose();
-    } catch (err: any) {
-      setError(err.message || "Error");
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err);
+      setError(message || "Error");
     }
     setLoading(false);
   };

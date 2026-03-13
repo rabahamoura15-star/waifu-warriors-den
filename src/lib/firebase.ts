@@ -16,6 +16,7 @@ import {
   setDoc,
   updateDoc,
   serverTimestamp,
+  type FieldValue,
 } from "firebase/firestore";
 
 const firebaseConfig = {
@@ -68,8 +69,8 @@ export interface PlayerProfile {
   questsCompleted: string[];
   totalTimeMinutes: number;
   weeklyTimeMinutes: number;
-  lastLogin: any;
-  createdAt: any;
+  lastLogin: FieldValue | null;
+  createdAt: FieldValue | null;
 }
 
 export async function getPlayerProfile(uid: string): Promise<PlayerProfile | null> {
@@ -99,5 +100,5 @@ export async function createPlayerProfile(uid: string, nickname: string): Promis
 }
 
 export async function updatePlayerField(uid: string, fields: Partial<PlayerProfile>) {
-  await updateDoc(doc(db, "players", uid), fields as any);
+  await updateDoc(doc(db, "players", uid), fields);
 }

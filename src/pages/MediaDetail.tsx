@@ -156,7 +156,7 @@ export default function MediaDetail() {
               {t("characters")}
             </h3>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-              {media.characters.edges.map((edge: any, i: number) => (
+              {media.characters.edges.map((edge, i) => (
                 <motion.div
                   key={edge.node.id}
                   initial={{ opacity: 0, y: 10 }}

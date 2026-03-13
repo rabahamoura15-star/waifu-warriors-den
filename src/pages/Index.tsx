@@ -34,7 +34,7 @@ export default function Index() {
         coins: profile.coins,
         energy: profile.energy,
         maxEnergy: profile.maxEnergy,
-        rank: profile.rank as any,
+        rank: profile.rank,
         level: profile.level,
         streak: profile.streak,
         cards: [],

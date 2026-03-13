@@ -79,6 +79,30 @@ query ($id: Int) {
   }
 }`;
 
+export interface AniCharacterNode {
+  id: number;
+  name: { full: string; native: string | null };
+  image: { large?: string | null; medium?: string | null };
+}
+
+export interface AniCharacterEdge {
+  role: string | null;
+  node: AniCharacterNode;
+}
+
+export interface AniRelationNode {
+  id: number;
+  title: { romaji: string; english: string | null };
+  coverImage: { large: string };
+  format: string;
+  type: string;
+}
+
+export interface AniRelationEdge {
+  relationType: string;
+  node: AniRelationNode;
+}
+
 export interface AniMedia {
   id: number;
   title: { romaji: string; english: string | null; native: string | null };
@@ -97,11 +121,11 @@ export interface AniMedia {
   meanScore: number | null;
   trending: number;
   nextAiringEpisode: { airingAt: number; episode: number } | null;
-  characters?: { edges: any[] };
-  relations?: { edges: any[] };
+  characters?: { edges: AniCharacterEdge[] };
+  relations?: { edges: AniRelationEdge[] };
 }
 
-async function query(q: string, variables: Record<string, unknown>): Promise<any> {
+async function query<T>(q: string, variables: Record<string, unknown>): Promise<T> {
   const res = await fetch(ANILIST_URL, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
